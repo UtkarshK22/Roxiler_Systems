@@ -29,10 +29,6 @@ export const signupSchema = z.object({
     .min(8, PASSWORD_ERROR)
     .max(16, PASSWORD_ERROR)
     .regex(PASSWORD_REGEX, PASSWORD_ERROR),
-  confirm_password: z.string(),
-}).refine((data) => data.password === data.confirm_password, {
-  message: 'Passwords do not match',
-  path: ['confirm_password'],
 });
 
 export const changePasswordSchema = z.object({

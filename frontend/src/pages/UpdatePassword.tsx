@@ -4,6 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../context/AuthContext';
 import { changePasswordSchema } from '../utils/validation';
 import { z } from 'zod';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Card } from '../components/ui/Card';
+import { PasswordInput } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
+import { useToast } from '../components/ui/Toast';
+import { CheckIcon, LockIcon } from '../components/ui/icons';
 
 type ChangePasswordForm = z.infer<typeof changePasswordSchema>;
 
@@ -12,10 +18,12 @@ export function UpdatePassword() {
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const { changePassword } = useAuth();
+  const toast = useToast();
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ChangePasswordForm>({
     resolver: zodResolver(changePasswordSchema),
@@ -31,74 +39,78 @@ export function UpdatePassword() {
         new_password: data.new_password,
       });
       setSuccess('Password updated successfully!');
+      toast.success('Your password was updated.');
+      reset();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update password');
+      const raw = err.response?.data?.message;
+      const message = Array.isArray(raw) ? raw.join(' ') : raw || 'Failed to update password';
+      setError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-sm border border-gray-200">
-        <h2 className="mb-6 text-2xl font-bold text-gray-900">Update Password</h2>
+    <div className="page-container py-8">
+      <PageHeader
+        title="Update password"
+        subtitle="Choose a strong password to keep your account secure."
+        backTo="/"
+        backLabel="Back to dashboard"
+      />
+
+      <Card className="max-w-lg">
+        <div className="mb-5 flex items-start gap-3 rounded-lg border border-line bg-raised p-3 text-sm text-muted">
+          <LockIcon className="mt-0.5 h-4 w-4 shrink-0" />
+          <p>
+            Passwords must be 8-16 characters and include at least one uppercase
+            letter and one special character.
+          </p>
+        </div>
 
         {error && (
-          <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-700 border border-red-200">
+          <div
+            role="alert"
+            className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+          >
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-4 rounded-md bg-green-50 p-4 text-sm text-green-700 border border-green-200">
+          <div
+            role="status"
+            className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300"
+          >
+            <CheckIcon className="h-4 w-4" />
             {success}
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label htmlFor="current_password" className="block text-sm font-medium text-gray-700">
-              Current Password
-            </label>
-            <input
-              id="current_password"
-              type="password"
-              {...register('current_password')}
-              className={`mt-1 block w-full rounded-md border shadow-sm ${
-                errors.current_password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-              }`}
-            />
-            {errors.current_password && (
-              <p className="mt-1 text-sm text-red-600">{errors.current_password.message}</p>
-            )}
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-1">
+          <PasswordInput
+            id="current_password"
+            label="Current password"
+            autoComplete="current-password"
+            required
+            error={errors.current_password?.message}
+            {...register('current_password')}
+          />
+          <PasswordInput
+            id="new_password"
+            label="New password"
+            autoComplete="new-password"
+            required
+            error={errors.new_password?.message}
+            {...register('new_password')}
+          />
 
-          <div>
-            <label htmlFor="new_password" className="block text-sm font-medium text-gray-700">
-              New Password (8-16 chars, 1 uppercase, 1 special char)
-            </label>
-            <input
-              id="new_password"
-              type="password"
-              {...register('new_password')}
-              className={`mt-1 block w-full rounded-md border shadow-sm ${
-                errors.new_password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-              }`}
-            />
-            {errors.new_password && (
-              <p className="mt-1 text-sm text-red-600">{errors.new_password.message}</p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            {submitting ? 'Updating...' : 'Update Password'}
-          </button>
+          <Button type="submit" fullWidth loading={submitting} className="mt-3">
+            {submitting ? 'Updating…' : 'Update password'}
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }

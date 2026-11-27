@@ -61,6 +61,34 @@ export interface PaginatedResponse<T> {
   limit: number;
 }
 
+/** The backend wraps every success payload as { data, message }. */
+export interface ApiEnvelope<T> {
+  data: T;
+  message: string;
+}
+
+/** Real shape returned by GET /admin/users (after the axios interceptor unwraps the envelope). */
+export interface UserListResponse {
+  users: User[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+/** Store summary returned by GET /admin/users/:id/store-rating. */
+export interface OwnerStoreSummary {
+  id: string;
+  name: string;
+  email: string;
+  address: string;
+  owner_id: string | null;
+}
+
+export interface OwnerStoreRating {
+  store: OwnerStoreSummary | null;
+  averageRating: number | null;
+}
+
 export interface ApiError {
   statusCode: number;
   message: string | string[];

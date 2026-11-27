@@ -90,11 +90,11 @@ Download and install from https://www.postgresql.org/download/windows/
 | Role | Email | Password |
 |------|-------|----------|
 | System Administrator | admin@roxiler.com | AdminPass123! |
-| Store Owner 1 | owner1@roxiler.com | OwnerPass123! |
-| Store Owner 2 | owner2@roxiler.com | OwnerPass123! |
-| Normal User 1 | user1@roxiler.com | UserPass123! |
-| Normal User 2 | user2@roxiler.com | UserPass123! |
-| Normal User 3 | user3@roxiler.com | UserPass123! |
+| Store Owner 1 | priya.ramanathan@roxiler.com | OwnerPass123! |
+| Store Owner 2 | rohan.kulkarni@roxiler.com | OwnerPass123! |
+| Normal User 1 | ananya.bhattacharya@roxiler.com | UserPass123! |
+| Normal User 2 | vikram.chauhan@roxiler.com | UserPass123! |
+| Normal User 3 | meera.subramanian@roxiler.com | UserPass123! |
 
 > **Note:** All seeded names satisfy the 20+ character minimum validation rule.
 

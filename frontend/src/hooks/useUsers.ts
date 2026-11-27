@@ -23,8 +23,9 @@ export function useUsers() {
       setError(null);
       try {
         const response = await usersAPI.getAll(params);
-        setUsers(response.data.data);
-        setTotal(response.data.total);
+        // GET /admin/users returns { users, total, page, limit }.
+        setUsers(response.data.users ?? []);
+        setTotal(response.data.total ?? 0);
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to fetch users');
       } finally {

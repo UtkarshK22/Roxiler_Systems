@@ -55,6 +55,12 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
+  @Get(':id/store-rating')
+  @Roles(UserRole.SYSTEM_ADMIN)
+  async getOwnerStoreRating(@Param('id') id: string) {
+    return this.usersService.getOwnerStoreRating(id);
+  }
+
   @Post()
   @Roles(UserRole.SYSTEM_ADMIN)
   async create(

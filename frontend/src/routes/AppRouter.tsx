@@ -7,18 +7,17 @@ import { Signup } from '../pages/Signup';
 import { AdminDashboard } from '../pages/AdminDashboard';
 import { AdminUsers } from '../pages/AdminUsers';
 import { AdminStores } from '../pages/AdminStores';
+import { AddUser } from '../pages/AddUser';
+import { AddStore } from '../pages/AddStore';
+import { UserDetail } from '../pages/UserDetail';
 import { UserStores } from '../pages/UserStores';
 import { OwnerDashboard } from '../pages/OwnerDashboard';
 import { UpdatePassword } from '../pages/UpdatePassword';
 import { Unauthorized } from '../pages/Unauthorized';
+import { NotFound } from '../pages/NotFound';
 import { Navbar } from '../components/Navbar';
-
-/** Where each role lands after login. */
-function homeForRole(role?: string): string {
-  if (role === 'SYSTEM_ADMIN') return '/admin';
-  if (role === 'STORE_OWNER') return '/owner';
-  return '/stores';
-}
+import { ToastProvider } from '../components/ui/Toast';
+import { homeForRole } from '../utils/routes';
 
 /** Layout route: blocks anonymous users, then renders the matched child route. */
 function ProtectedLayout() {
@@ -70,10 +69,34 @@ function RouterContent() {
           }
         />
         <Route
+          path="/admin/users/new"
+          element={
+            <RoleRoute allowedRoles={['SYSTEM_ADMIN']}>
+              <AddUser />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/users/:id"
+          element={
+            <RoleRoute allowedRoles={['SYSTEM_ADMIN']}>
+              <UserDetail />
+            </RoleRoute>
+          }
+        />
+        <Route
           path="/admin/stores"
           element={
             <RoleRoute allowedRoles={['SYSTEM_ADMIN']}>
               <AdminStores />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/stores/new"
+          element={
+            <RoleRoute allowedRoles={['SYSTEM_ADMIN']}>
+              <AddStore />
             </RoleRoute>
           }
         />
@@ -103,10 +126,10 @@ function RouterContent() {
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Route>
 
-      {/* Fallback */}
+      {/* Fallback: authenticated users see a friendly 404, others go to login. */}
       <Route
         path="*"
-        element={<Navigate to={user ? homeForRole(user.role) : '/login'} replace />}
+        element={user ? <NotFound /> : <Navigate to="/login" replace />}
       />
     </Routes>
   );
@@ -116,10 +139,12 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <RouterContent />
-        </div>
+        <ToastProvider>
+          <div className="min-h-screen bg-page">
+            <Navbar />
+            <RouterContent />
+          </div>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   );

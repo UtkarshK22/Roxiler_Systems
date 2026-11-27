@@ -1,7 +1,17 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useDashboard } from '../hooks/useDashboard';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { PageHeader } from '../components/ui/PageHeader';
+import { StatCard } from '../components/ui/StatCard';
+import { Card } from '../components/ui/Card';
+import {
+  ArrowRightIcon,
+  PlusIcon,
+  StarIcon,
+  StoreIcon,
+  UsersIcon,
+} from '../components/ui/icons';
 
 export function AdminDashboard() {
   const { fetchAdminDashboard, adminData, loading, error } = useDashboard();
@@ -11,90 +21,79 @@ export function AdminDashboard() {
     fetchAdminDashboard();
   }, [fetchAdminDashboard]);
 
-  const statCards = [
-    {
-      label: 'Total Users',
-      value: adminData?.totalUsers ?? 0,
-      icon: '👥',
-      href: '/admin/users',
-    },
-    {
-      label: 'Total Stores',
-      value: adminData?.totalStores ?? 0,
-      icon: '🏪',
-      href: '/admin/stores',
-    },
-    {
-      label: 'Total Ratings',
-      value: adminData?.totalRatings ?? 0,
-      icon: '⭐',
-      href: '/stores',
-    },
-  ];
-
-  if (loading) {
-    return <div className="py-8 text-center text-gray-500">Loading dashboard...</div>;
-  }
-
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="text-gray-600">
-          Welcome, {user?.name}
-        </p>
-      </div>
+    <div className="page-container py-8">
+      <PageHeader
+        title="Admin Dashboard"
+        subtitle={
+          <span>
+            Welcome back, <span className="font-medium text-fg">{user?.name}</span>
+          </span>
+        }
+      />
 
       {error && (
-        <div className="rounded-md bg-red-50 p-4 text-sm text-red-700 border border-red-200 mb-6">
+        <div
+          role="alert"
+          className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+        >
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {statCards.map((card) => (
-          <div
-            key={card.label}
-            className="bg-white overflow-hidden shadow rounded-lg border border-gray-200"
-          >
-            <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg font-medium text-gray-900">{card.label}</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                <Link to={card.href} className="text-blue-600 hover:underline">
-                  Manage {card.label.toLowerCase()}
-                </Link>
-              </p>
-              <p className="mt-4 text-3xl font-extrabold text-gray-900">
-                {card.value}
-              </p>
-            </div>
-          </div>
-        ))}
+      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <StatCard
+          label="Total Users"
+          value={adminData?.totalUsers ?? 0}
+          icon={<UsersIcon className="h-5 w-5" />}
+          href="/admin/users"
+          loading={loading}
+        />
+        <StatCard
+          label="Total Stores"
+          value={adminData?.totalStores ?? 0}
+          icon={<StoreIcon className="h-5 w-5" />}
+          href="/admin/stores"
+          loading={loading}
+        />
+        <StatCard
+          label="Total Ratings"
+          value={adminData?.totalRatings ?? 0}
+          icon={<StarIcon className="h-5 w-5" />}
+          href="/admin/stores?sortBy=average_rating&order=DESC"
+          loading={loading}
+        />
       </div>
 
-      <div className="bg-white shadow rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link
-            to="/admin/users/new"
-            className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition"
-          >
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-base font-semibold text-fg">Quick actions</h2>
+            <p className="mt-0.5 text-sm text-muted">
+              Create accounts and stores, or jump straight into a list.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Link to="/admin/users/new" className="btn-primary">
+            <PlusIcon className="h-4 w-4" />
             Add New User
           </Link>
-          <Link
-            to="/admin/stores/new"
-            className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition"
-          >
+          <Link to="/admin/stores/new" className="btn-primary">
+            <PlusIcon className="h-4 w-4" />
             Add New Store
           </Link>
-          <Link
-            to="/admin/users"
-            className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition"
-          >
-            View All Users
+          <Link to="/admin/users" className="btn-secondary">
+            View all users
+            <ArrowRightIcon className="h-4 w-4" />
+          </Link>
+          <Link to="/admin/stores" className="btn-secondary">
+            View all stores
+            <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

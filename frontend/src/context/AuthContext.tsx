@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import { User, UserRole } from '../types';
+import { User } from '../types';
 import { authAPI } from '../api/auth';
 
 interface AuthContextType {

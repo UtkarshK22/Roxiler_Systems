@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, Route, useMatch } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
 
@@ -10,7 +10,6 @@ interface RoleRouteProps {
 
 export function RoleRoute({ allowedRoles, children }: RoleRouteProps) {
   const { user, isLoading } = useAuth();
-  const match = useMatch({ path: '*' });
 
   if (isLoading) {
     return (

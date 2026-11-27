@@ -10,7 +10,9 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "rootDir": "./src",
-    // "ignoreDeprecations": "6.0",
+    // Editor-only: the workspace TypeScript (5.9.x) rejects ignoreDeprecations "6.0" (TS5103).
+    // Do not add it; the baseUrl deprecation notice comes from the editor's newer bundled TS.
+    "types": ["node", "jest"],
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,

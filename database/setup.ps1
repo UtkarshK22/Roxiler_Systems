@@ -81,11 +81,11 @@ Write-Host ""
 Write-Host "=== Database Setup Complete ===" -ForegroundColor Cyan
 Write-Host "The following demo credentials can now be used:" -ForegroundColor Yellow
 Write-Host "  Admin:      admin@roxiler.com / AdminPass123!" -ForegroundColor White
-Write-Host "  Owner 1:    owner1@roxiler.com / OwnerPass123!" -ForegroundColor White
-Write-Host "  Owner 2:    owner2@roxiler.com / OwnerPass123!" -ForegroundColor White
-Write-Host "  User 1:     user1@roxiler.com / UserPass123!" -ForegroundColor White
-Write-Host "  User 2:     user2@roxiler.com / UserPass123!" -ForegroundColor White
-Write-Host "  User 3:     user3@roxiler.com / UserPass123!" -ForegroundColor White
+Write-Host "  Owner 1:    priya.ramanathan@roxiler.com / OwnerPass123!" -ForegroundColor White
+Write-Host "  Owner 2:    rohan.kulkarni@roxiler.com / OwnerPass123!" -ForegroundColor White
+Write-Host "  User 1:     ananya.bhattacharya@roxiler.com / UserPass123!" -ForegroundColor White
+Write-Host "  User 2:     vikram.chauhan@roxiler.com / UserPass123!" -ForegroundColor White
+Write-Host "  User 3:     meera.subramanian@roxiler.com / UserPass123!" -ForegroundColor White
 Write-Host ""
 Write-Host "To start the backend: cd D:\Job Stuff\Roxiler_Systems_assignment\backend && npm run start:dev"
 Write-Host "To start the frontend: cd D:\Job Stuff\Roxiler_Systems_assignment\frontend && npm run dev"

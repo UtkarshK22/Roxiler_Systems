@@ -7,6 +7,12 @@ import { User, UserRole } from '../common/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 
+// bcryptjs is imported with `import * as` (compiled to a frozen __importStar namespace),
+// so jest.spyOn() cannot redefine its properties. Mock the module instead.
+jest.mock('bcryptjs');
+
+const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
+
 const mockUser: User = {
   id: 'test-uuid-1',
   name: 'Test System Admin User',
@@ -63,7 +69,7 @@ describe('AuthService', () => {
   describe('login', () => {
     it('should return JWT token and user when credentials are valid', async () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
-      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
+      mockedBcrypt.compare.mockResolvedValue(true as never);
 
       const result = await service.login(mockUser);
 
@@ -76,9 +82,12 @@ describe('AuthService', () => {
   describe('signup', () => {
     it('should create a new user with NORMAL_USER role', async () => {
       mockUserRepository.findOne.mockResolvedValue(null);
-      mockUserRepository.create.mockReturnValue(mockUser);
-      mockUserRepository.save.mockResolvedValue(mockUser);
-      jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashed' as never);
+      mockUserRepository.create.mockImplementation((dto: Partial<User>) => ({
+        ...mockUser,
+        ...dto,
+      }));
+      mockUserRepository.save.mockImplementation(async (user: User) => user);
+      mockedBcrypt.hash.mockResolvedValue('hashed' as never);
 
       const result = await service.signup({
         name: 'Test Normal User Account',
@@ -111,8 +120,8 @@ describe('AuthService', () => {
   describe('changePassword', () => {
     it('should update password when current password is correct', async () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
-      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
-      jest.spyOn(bcrypt, 'hash').mockResolvedValue('newhashed' as never);
+      mockedBcrypt.compare.mockResolvedValue(true as never);
+      mockedBcrypt.hash.mockResolvedValue('newhashed' as never);
       mockUserRepository.save.mockResolvedValue(mockUser);
 
       const result = await service.changePassword(
@@ -126,7 +135,7 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException when current password is wrong', async () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
-      jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
+      mockedBcrypt.compare.mockResolvedValue(false as never);
 
       await expect(
         service.changePassword(mockUser.id, 'WrongPass123!', 'NewPass123!'),

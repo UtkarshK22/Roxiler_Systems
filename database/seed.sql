@@ -14,7 +14,7 @@ INSERT INTO users (id, name, email, password_hash, address, role) VALUES
     'System Administrator Roxiler',
     'admin@roxiler.com',
     '$2a$12$K1x8R7L3P9Q2W5E4R6T8Y0U1I2O3P4A5S6D7F8G9H0J1K2L3M4N5',
-    '123 Admin Street, Admin City, AC 12345',
+    'Roxiler Systems, 5th Floor, Cyber Towers, HITEC City, Hyderabad 500081',
     'SYSTEM_ADMIN'
 );
 
@@ -23,18 +23,18 @@ INSERT INTO users (id, name, email, password_hash, address, role) VALUES
 INSERT INTO users (id, name, email, password_hash, address, role) VALUES
 (
     uuid_generate_v4(),
-    'John Store Owner One',
-    'owner1@roxiler.com',
+    'Priya Venkatesh Ramanathan',
+    'priya.ramanathan@roxiler.com',
     '$2a$12$K1x8R7L3P9Q2W5E4R6T8Y0U1I2O3P4A5S6D7F8G9H0J1K2L3M4N5',
-    '456 Owner Avenue, Owner City, OC 23456',
+    '12 Besant Nagar Beach Road, Chennai, Tamil Nadu 600090',
     'STORE_OWNER'
 ),
 (
     uuid_generate_v4(),
-    'Jane Store Owner Two',
-    'owner2@roxiler.com',
+    'Rohan Deshpande Kulkarni',
+    'rohan.kulkarni@roxiler.com',
     '$2a$12$K1x8R7L3P9Q2W5E4R6T8Y0U1I2O3P4A5S6D7F8G9H0J1K2L3M4N5',
-    '789 Owner Boulevard, Owner Town, OT 34567',
+    '45 Koregaon Park Lane 7, Pune, Maharashtra 411001',
     'STORE_OWNER'
 );
 
@@ -43,26 +43,26 @@ INSERT INTO users (id, name, email, password_hash, address, role) VALUES
 INSERT INTO users (id, name, email, password_hash, address, role) VALUES
 (
     uuid_generate_v4(),
-    'Alice Normal User One',
-    'user1@roxiler.com',
+    'Ananya Sharma Bhattacharya',
+    'ananya.bhattacharya@roxiler.com',
     '$2a$12$K1x8R7L3P9Q2W5E4R6T8Y0U1I2O3P4A5S6D7F8G9H0J1K2L3M4N5',
-    '301 Resident Lane, Resident City, RC 76543',
+    '8B Lake Gardens, Kolkata, West Bengal 700045',
     'NORMAL_USER'
 ),
 (
     uuid_generate_v4(),
-    'Bob Normal User Two',
-    'user2@roxiler.com',
+    'Vikram Singh Rajput Chauhan',
+    'vikram.chauhan@roxiler.com',
     '$2a$12$K1x8R7L3P9Q2W5E4R6T8Y0U1I2O3P4A5S6D7F8G9H0J1K2L3M4N5',
-    '302 Resident Lane, Resident City, RC 76543',
+    '27 Civil Lines, Jaipur, Rajasthan 302006',
     'NORMAL_USER'
 ),
 (
     uuid_generate_v4(),
-    'Carol Normal User Three',
-    'user3@roxiler.com',
+    'Meera Krishnan Subramanian',
+    'meera.subramanian@roxiler.com',
     '$2a$12$K1x8R7L3P9Q2W5E4R6T8Y0U1I2O3P4A5S6D7F8G9H0J1K2L3M4N5',
-    '303 Resident Lane, Resident City, RC 76543',
+    '63 Anna Nagar West, Chennai, Tamil Nadu 600040',
     'NORMAL_USER'
 );
 
@@ -71,38 +71,38 @@ INSERT INTO users (id, name, email, password_hash, address, role) VALUES
 INSERT INTO stores (id, name, email, address, owner_id) VALUES
 (
     uuid_generate_v4(),
-    'Roxiler Electronics Store',
-    'electronics@roxiler.com',
-    '101 Tech Plaza, Tech City, TC 54321',
-    (SELECT id FROM users WHERE email = 'owner1@roxiler.com' LIMIT 1)
+    'Ramanathan Electronics Emporium',
+    'priya.electronics@roxiler.com',
+    '14 Anna Salai, Chennai, Tamil Nadu 600002',
+    (SELECT id FROM users WHERE email = 'priya.ramanathan@roxiler.com' LIMIT 1)
 ),
 (
     uuid_generate_v4(),
-    'Roxiler Grocery Mart',
-    'grocery@roxiler.com',
-    '202 Market Street, Market City, MC 65432',
-    (SELECT id FROM users WHERE email = 'owner2@roxiler.com' LIMIT 1)
+    'Kulkarni Fresh Grocery Mart',
+    'rohan.grocery@roxiler.com',
+    '22 Fergusson College Road, Pune, Maharashtra 411004',
+    (SELECT id FROM users WHERE email = 'rohan.kulkarni@roxiler.com' LIMIT 1)
 );
 
 -- Sample Ratings
 INSERT INTO ratings (user_id, store_id, rating) VALUES
 (
-    (SELECT id FROM users WHERE email = 'user1@roxiler.com' LIMIT 1),
-    (SELECT id FROM stores WHERE email = 'electronics@roxiler.com' LIMIT 1),
+    (SELECT id FROM users WHERE email = 'ananya.bhattacharya@roxiler.com' LIMIT 1),
+    (SELECT id FROM stores WHERE email = 'priya.electronics@roxiler.com' LIMIT 1),
     5
 ),
 (
-    (SELECT id FROM users WHERE email = 'user2@roxiler.com' LIMIT 1),
-    (SELECT id FROM stores WHERE email = 'electronics@roxiler.com' LIMIT 1),
+    (SELECT id FROM users WHERE email = 'vikram.chauhan@roxiler.com' LIMIT 1),
+    (SELECT id FROM stores WHERE email = 'priya.electronics@roxiler.com' LIMIT 1),
     4
 ),
 (
-    (SELECT id FROM users WHERE email = 'user3@roxiler.com' LIMIT 1),
-    (SELECT id FROM stores WHERE email = 'grocery@roxiler.com' LIMIT 1),
+    (SELECT id FROM users WHERE email = 'meera.subramanian@roxiler.com' LIMIT 1),
+    (SELECT id FROM stores WHERE email = 'rohan.grocery@roxiler.com' LIMIT 1),
     3
 ),
 (
-    (SELECT id FROM users WHERE email = 'user1@roxiler.com' LIMIT 1),
-    (SELECT id FROM stores WHERE email = 'grocery@roxiler.com' LIMIT 1),
+    (SELECT id FROM users WHERE email = 'ananya.bhattacharya@roxiler.com' LIMIT 1),
+    (SELECT id FROM stores WHERE email = 'rohan.grocery@roxiler.com' LIMIT 1),
     5
 );

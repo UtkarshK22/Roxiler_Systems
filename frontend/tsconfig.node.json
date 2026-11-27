@@ -8,6 +8,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "strict": true,
+    "esModuleInterop": true,
+    "types": ["node"],
     "composite": true
   },
   "include": ["vite.config.ts"]

@@ -65,10 +65,16 @@ export class StoresService {
     }
 
     const allowedSortFields = ['name', 'email', 'address', 'created_at'];
+    const sortByAverageRating = sortBy === 'average_rating';
     const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'name';
-    queryBuilder.orderBy(`store.${safeSortBy}`, order);
 
-    queryBuilder.skip((page - 1) * limit).take(limit);
+    if (sortByAverageRating) {
+      // Average rating is computed below; fetch the filtered set and sort in
+      // memory so ordering stays correct across pages (small dataset).
+    } else {
+      queryBuilder.orderBy(`store.${safeSortBy}`, order);
+      queryBuilder.skip((page - 1) * limit).take(limit);
+    }
 
     const [stores, total] = await queryBuilder.getManyAndCount();
 
@@ -97,6 +103,25 @@ export class StoresService {
         };
       }),
     );
+
+    if (sortByAverageRating) {
+      enrichedStores.sort((a, b) => {
+        if (a.average_rating === null && b.average_rating === null) return 0;
+        // Stores without ratings always sort last, regardless of direction.
+        if (a.average_rating === null) return 1;
+        if (b.average_rating === null) return -1;
+        return order === 'ASC'
+          ? a.average_rating - b.average_rating
+          : b.average_rating - a.average_rating;
+      });
+      const start = (page - 1) * limit;
+      return {
+        stores: enrichedStores.slice(start, start + limit),
+        total,
+        page,
+        limit,
+      };
+    }
 
     return { stores: enrichedStores, total, page, limit };
   }

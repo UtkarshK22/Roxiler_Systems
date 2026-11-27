@@ -1,5 +1,5 @@
 import axiosInstance from './axiosInstance';
-import { User, PaginatedResponse } from '../types';
+import { OwnerStoreRating, User, UserListResponse } from '../types';
 
 export const usersAPI = {
   getAll: (params?: {
@@ -12,9 +12,12 @@ export const usersAPI = {
     sortBy?: string;
     order?: 'ASC' | 'DESC';
   }) =>
-    axiosInstance.get<PaginatedResponse<User>>('/admin/users', { params }),
+    axiosInstance.get<UserListResponse>('/admin/users', { params }),
 
   getById: (id: string) => axiosInstance.get<User>(`/admin/users/${id}`),
+
+  getOwnerStoreRating: (id: string) =>
+    axiosInstance.get<OwnerStoreRating>(`/admin/users/${id}/store-rating`),
 
   create: (data: {
     name: string;

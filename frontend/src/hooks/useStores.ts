@@ -22,9 +22,10 @@ export function useStores() {
       setLoading(true);
       setError(null);
       try {
-        const response = params?.admin
-          ? await storesAPI.getAllAdmin(params)
-          : await storesAPI.getAll(params);
+        const { admin, ...queryParams } = params ?? {};
+        const response = admin
+          ? await storesAPI.getAllAdmin(queryParams)
+          : await storesAPI.getAll(queryParams);
         setStores(response.data.stores);
         setTotal(response.data.total);
       } catch (err: any) {
@@ -48,5 +49,5 @@ export function useStores() {
     [],
   );
 
-  return { stores, total, loading, error, fetchStores, upsertRating };
+  return { stores, total, loading, error, fetchStores, upsertRating, setStores };
 }

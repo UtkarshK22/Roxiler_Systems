@@ -1,27 +1,37 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUsers } from '../hooks/useUsers';
-import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
-import { DataTable } from '../components/DataTable';
-import { FilterBar } from '../components/FilterBar';
+import { DataTable } from '../components/ui/DataTable';
+import { FilterBar } from '../components/ui/FilterBar';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Badge } from '../components/ui/Badge';
 import { User } from '../types';
+import { PlusIcon } from '../components/ui/icons';
+
+const ROLE_OPTIONS = [
+  { value: '', label: 'All roles' },
+  { value: 'SYSTEM_ADMIN', label: 'System Admin' },
+  { value: 'NORMAL_USER', label: 'Normal User' },
+  { value: 'STORE_OWNER', label: 'Store Owner' },
+];
+
+function truncated(value: unknown, maxWidth = '220px') {
+  const text = value === null || value === undefined || value === '' ? '—' : String(value);
+  return (
+    <span className="block truncate" style={{ maxWidth }} title={text}>
+      {text}
+    </span>
+  );
+}
 
 export function AdminUsers() {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState('name');
   const [order, setOrder] = useState<'ASC' | 'DESC'>('ASC');
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const {
-    users,
-    total,
-    loading,
-    error,
-    fetchUsers,
-    createUser,
-  } = useUsers();
+  const { users, total, loading, error, fetchUsers } = useUsers();
 
   const handleFiltersChange = useCallback((newFilters: Record<string, string>) => {
     setFilters(newFilters);
@@ -29,7 +39,7 @@ export function AdminUsers() {
   }, []);
 
   const handleSortChange = useCallback((newSortBy: string, newOrder: 'ASC' | 'DESC') => {
-    setSortBy(newSortBy as any);
+    setSortBy(newSortBy);
     setOrder(newOrder);
   }, []);
 
@@ -43,54 +53,71 @@ export function AdminUsers() {
     });
   }, [filters, page, sortBy, order, fetchUsers]);
 
-  const handleCreate = async (data: {
-    name: string;
-    email: string;
-    password: string;
-    address: string;
-    role: string;
-  }) => {
-    try {
-      await createUser(data);
-      setShowAddForm(false);
-      fetchUsers({
-        ...filters,
-        page,
-        limit: 10,
-        sortBy,
-        order,
-      });
-    } catch (err: any) {
-      // Error handled in hook
-    }
-  };
-
   const columns = [
-    { key: 'name', label: 'Name', sortable: true },
-    { key: 'email', label: 'Email', sortable: true },
-    { key: 'address', label: 'Address', sortable: true },
-    { key: 'role', label: 'Role', sortable: true },
+    {
+      key: 'name',
+      label: 'Name',
+      sortable: true,
+      render: (value: unknown) => truncated(value),
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      sortable: true,
+      render: (value: unknown) => truncated(value, '240px'),
+    },
+    {
+      key: 'address',
+      label: 'Address',
+      sortable: true,
+      render: (value: unknown) => truncated(value, '260px'),
+    },
+    {
+      key: 'role',
+      label: 'Role',
+      sortable: true,
+      render: (_value: unknown, item: User) => <Badge role={item.role} />,
+    },
+    {
+      key: 'actions',
+      label: '',
+      sortable: false,
+      headerClassName: 'w-16',
+      render: (_value: unknown, item: User) => (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            navigate(`/admin/users/${item.id}`);
+          }}
+          className="rounded text-sm font-medium text-primary transition-colors hover:text-primary-hover"
+        >
+          View
+        </button>
+      ),
+    },
   ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-600">
-            Manage system users (normal users and admins)
-          </p>
-        </div>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition"
-        >
-          + Add User
-        </button>
-      </div>
+    <div className="page-container py-8">
+      <PageHeader
+        title="Users"
+        subtitle="Manage system administrators, store owners and normal users."
+        backTo="/admin"
+        backLabel="Back to dashboard"
+        actions={
+          <Link to="/admin/users/new" className="btn-primary">
+            <PlusIcon className="h-4 w-4" />
+            Add User
+          </Link>
+        }
+      />
 
       {error && (
-        <div className="rounded-md bg-red-50 p-4 text-sm text-red-700 border border-red-200 mb-6">
+        <div
+          role="alert"
+          className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+        >
           {error}
         </div>
       )}
@@ -100,7 +127,12 @@ export function AdminUsers() {
           { key: 'name', label: 'Name', placeholder: 'Filter by name' },
           { key: 'email', label: 'Email', placeholder: 'Filter by email' },
           { key: 'address', label: 'Address', placeholder: 'Filter by address' },
-          { key: 'role', label: 'Role', placeholder: 'Filter by role' },
+          {
+            key: 'role',
+            label: 'Role',
+            type: 'select',
+            options: ROLE_OPTIONS,
+          },
         ]}
         onFiltersChange={handleFiltersChange}
       />
@@ -114,150 +146,12 @@ export function AdminUsers() {
         loading={loading}
         onPageChange={setPage}
         onSortChange={handleSortChange}
-        emptyMessage="No users found"
+        initialSortBy={sortBy}
+        initialOrder={order}
+        onRowClick={(item) => navigate(`/admin/users/${item.id}`)}
+        emptyMessage="No users match your filters"
+        emptyDescription="Try clearing the search fields or choosing a different role."
       />
-
-      {showAddForm && (
-        <div className="mt-8 bg-white p-6 rounded-lg border border-gray-200 shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Add New User</h3>
-          <AddUserForm onSubmit={handleCreate} onCancel={() => setShowAddForm(false)} />
-        </div>
-      )}
-
-      {selectedUser && (
-        <div className="mt-8 bg-white p-6 rounded-lg border border-gray-200 shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">User Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-700">Name:</span>
-              <span className="text-gray-600">{selectedUser.name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-700">Email:</span>
-              <span className="text-gray-600">{selectedUser.email}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-700">Address:</span>
-              <span className="text-gray-600">{selectedUser.address || 'Not provided'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-700">Role:</span>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                selectedUser.role === 'SYSTEM_ADMIN'
-                  ? 'bg-red-100 text-red-700'
-                  : selectedUser.role === 'STORE_OWNER'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-green-100 text-green-700'
-              }`}>
-                {selectedUser.role}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={() => setSelectedUser(null)}
-            className="mt-4 text-sm text-blue-600 hover:text-blue-800"
-          >
-            Close
-          </button>
-        </div>
-      )}
     </div>
-  );
-}
-
-function AddUserForm({ onSubmit, onCancel }: { onSubmit: any; onCancel: () => void }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    address: '',
-    password: '',
-    role: 'NORMAL_USER' as const,
-  });
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleChange = (key: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      await onSubmit(formData);
-      setFormData({ name: '', email: '', address: '', password: '', role: 'NORMAL_USER' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSave} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">Name (20-60 chars)</label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => handleChange('name', e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleChange('email', e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-          />
-        </div>
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-gray-700">Address (max 400 chars)</label>
-        <input
-          type="text"
-          value={formData.address}
-          onChange={(e) => handleChange('address', e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-        />
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-gray-700">Password (8-16 chars, 1 uppercase, 1 special)</label>
-        <input
-          type="password"
-          value={formData.password}
-          onChange={(e) => handleChange('password', e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-        />
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-gray-700">Role</label>
-        <select
-          value={formData.role}
-          onChange={(e) => handleChange('role', e.target.value as any)}
-          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-        >
-          <option value="NORMAL_USER">Normal User</option>
-          <option value="SYSTEM_ADMIN">System Administrator</option>
-          <option value="STORE_OWNER">Store Owner</option>
-        </select>
-      </div>
-      <div className="flex gap-3 pt-2">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50 transition"
-        >
-          {submitting ? 'Creating...' : 'Create User'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 text-gray-600 rounded-md hover:bg-gray-100 border border-gray-300 font-medium"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
   );
 }
