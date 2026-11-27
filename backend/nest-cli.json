@@ -1,0 +1,9 @@
+{
+  "collection": "@nestjs/schematics",
+  "typescriptConfigPath": "tsconfig.json",
+  "compilerOptions": {
+    "assets": [
+      { "include": "**/*.json", "outDir": "dist", "watchAssets": true }
+    ]
+  }
+}
